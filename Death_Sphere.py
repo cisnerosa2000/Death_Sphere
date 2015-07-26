@@ -4,7 +4,7 @@ import math
 import os
 
 root = Tk()
-root.title("Cannon bounce")
+root.title("Death Sphere")
 root.geometry("1000x600+0+0")
 root.attributes('-alpha',.80)
 
@@ -19,7 +19,7 @@ class Bullets(object):
         if cannon.timer > 0:
             self.diameter = 45
         else:
-            self.diameter = 10
+            self.diameter = 16
         self.x = canvas.coords(cannon.mag_line)[0] - self.diameter
         self.y = canvas.coords(cannon.mag_line)[1] - self.diameter
         self.circle = canvas.create_oval(self.x,self.y,self.x+self.diameter*2,self.y+self.diameter*2,fill=cannon.color)
@@ -144,9 +144,10 @@ class Cannon(object):
             self.alive = False
         
             death = Toplevel()
+            death.title('You Died!')
             text = Text(death,bg="black",fg="white")
             death.geometry("250x150+375+225")
-            text.insert(INSERT,"YOU DIED! YOUR SCORE IS %s" % self.score)
+            text.insert(INSERT,"YOUR SCORE IS %s" % self.score)
             text.config(state=DISABLED)
             text.pack()
         
@@ -263,7 +264,6 @@ class Cannon(object):
                 for i in self.bullet_overlap:
                     if "target" in canvas.gettags(i):
                         if "powerup" in canvas.gettags(i):
-                            print "powerup!"
                             self.timer = 200
                             
                             
@@ -274,9 +274,9 @@ class Cannon(object):
                         self.vector += self.needed
                         
                         try:
-                        
-                            canvas.delete(bullet.circle)
-                            bullet_list.remove(bullet)
+                            if self.timer == 0:
+                                canvas.delete(bullet.circle)
+                                bullet_list.remove(bullet)
                         
                             canvas.delete(i)
                         except ValueError:
