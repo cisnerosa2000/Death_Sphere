@@ -16,7 +16,7 @@ bullet_list = []
 class Bullets(object):
     def __init__(self):
         
-        if cannon.timer > 0:
+        if cannon.timer > 10:
             self.diameter = 45
         else:
             self.diameter = 16
@@ -93,7 +93,7 @@ class Cannon(object):
         self.count = 0
         self.score = 0
         self.alive = True
-        self.delay = 200
+        self.delay = 100
         self.timer = 0
         
         
@@ -114,7 +114,7 @@ class Cannon(object):
         self.bullet_loop()
         self.update()
         
-    def update(self):        
+    def update(self):
             
         
         if self.count < 5:
@@ -133,6 +133,7 @@ class Cannon(object):
         
         if self.vector >= 5 and self.enemies_on_canvas == True:
             if self.timer < 4:
+                self.timer = 0
                 self.vector -= 4
                 self.x += 2
                 self.y += 2
@@ -145,7 +146,7 @@ class Cannon(object):
         
             death = Toplevel()
             death.title('You Died!')
-            text = Text(death,bg="black",fg="white")
+            text = Text(death,bg="black",fg=self.color)
             death.geometry("250x150+375+225")
             text.insert(INSERT,"YOUR SCORE IS %s" % self.score)
             text.config(state=DISABLED)
@@ -264,7 +265,7 @@ class Cannon(object):
                 for i in self.bullet_overlap:
                     if "target" in canvas.gettags(i):
                         if "powerup" in canvas.gettags(i):
-                            self.timer = 200
+                            self.timer = 250
                             
                             
                         self.needed = self.max_vector - self.vector
@@ -343,13 +344,13 @@ class Menu(object):
         self.window.geometry("300x100+350+200")
         self.window.config(bg="black")
         
-        
-       
-        
-        
-        
-        self.button = Button(self.window,text="Begin Game",bg="orange",command=self.game_start)
+    
+        self.button = Button(self.window,text="Begin Game",bg="black",command=self.game_start)
+        self.button.config(highlightbackground="black")
         self.button.pack()
+        
+        self.author = Label(self.window,text="Created by Adrian Cisneros",bg="black",fg="green")
+        self.author.pack()
         
         root.lower(belowThis=None)
         self.window.lift(aboveThis=None)
@@ -371,6 +372,8 @@ menu = Menu()
 
 
       
+
+
 
 canvas.pack()
 root.mainloop()
