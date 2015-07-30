@@ -56,17 +56,33 @@ class Targets(object):
                 
             
         
-        self.diameter = random.randint(20,50)
+        for powerup in target_list:
+            if "powerup" in canvas.gettags(powerup.circle):
+                for line in powerup.llist:
+                    canvas.delete(line)
+                for target in target_list:
+                    if target != powerup:
+                        powerup.connect_line = canvas.create_line(powerup.coords[0]+powerup.diameter/2,powerup.coords[1]+powerup.diameter/2,target.coords[0]+target.diameter/2,target.coords[1]+target.diameter/2,fill="purple")
+                        powerup.llist.append(powerup.connect_line)
+                
     
-        if random.choice(range(0,80)) == 69:
-            self.circle = canvas.create_oval(self.coords[0],self.coords[1],self.coords[0]+self.diameter,self.coords[1]+self.diameter,fill="pink",tags=("target","powerup"))
+        if random.choice(range(0,80)) == 5 and len(canvas.find_withtag("powerup")) < 1:
+            self.llist = []
+            self.diameter = 30
+            self.circle = canvas.create_oval(self.coords[0],self.coords[1],self.coords[0]+self.diameter,self.coords[1]+self.diameter,fill="purple",tags=("target","powerup"))
             target_list.append(self)
-            self.line = canvas.create_line(cannon.x+cannon.vector/2,cannon.y+cannon.vector/2,self.coords[0]+self.diameter/2,self.coords[1]+self.diameter/2,fill="pink")
+            self.line = canvas.create_line(cannon.x+cannon.vector/2,cannon.y+cannon.vector/2,self.coords[0]+self.diameter/2,self.coords[1]+self.diameter/2,fill="purple",tags="powerup")
+            self.coords = canvas.coords(self.circle)
+            for i in target_list:
+                if i != self:
+                    self.connect_line = canvas.create_line(self.coords[0]+self.diameter/2,self.coords[1]+self.diameter/2,i.coords[0]+i.diameter/2,i.coords[1]+i.diameter/2,fill="purple")
+                    self.llist.append(self.connect_line)
         else:
+            self.diameter = random.randint(20,50)
             self.circle = canvas.create_oval(self.coords[0],self.coords[1],self.coords[0]+self.diameter,self.coords[1]+self.diameter,fill=cannon.target_color,tags="target")
             target_list.append(self)
             self.line = canvas.create_line(cannon.x+cannon.vector/2,cannon.y+cannon.vector/2,self.coords[0]+self.diameter/2,self.coords[1]+self.diameter/2,fill=cannon.target_color)
-        
+            self.coords = canvas.coords(self.circle)
         
             
     
@@ -119,7 +135,7 @@ class Cannon(object):
         
         if self.count < 5:
             self.count += 1
-        elif self.count >= 0 and self.alive == True and len(target_list) < 10:
+        elif self.count >= 0 and self.alive == True and len(target_list) < 20:
             self.count = 0
             if self.delay > 40:
                 self.delay -= 1
@@ -134,9 +150,9 @@ class Cannon(object):
         if self.vector >= 5 and self.enemies_on_canvas == True:
             if self.timer < 4:
                 self.timer = 0
-                self.vector -= 4
-                self.x += 2
-                self.y += 2
+                self.vector -= 4 # 4
+                self.x += 2 # 2
+                self.y += 2 # 2
             else:
                 self.timer -= 4
             
@@ -153,19 +169,12 @@ class Cannon(object):
             text.pack()
         
         if self.score >= 300:
+            self.color = "black"
+            self.target_color = "black"
+            self.cursor_color = "black"
+            self.bg_color = "white"
+            canvas.config(bg="white")
             
-            if self.count % 2 == 0:
-                self.color = "white"
-                self.bg_color = "black"
-                self.target_color = "white"
-                self.cursor_color = "white"
-
-            else:
-                self.color = "black"
-                self.bg_color = "white"
-                self.target_color = "black"
-                self.cursor_color = "black"
-            canvas.config(bg=self.bg_color)
                 
             
         elif self.score >= 200:
@@ -265,7 +274,8 @@ class Cannon(object):
                 for i in self.bullet_overlap:
                     if "target" in canvas.gettags(i):
                         if "powerup" in canvas.gettags(i):
-                            self.timer = 250
+                            self.timer = 300
+                            
                             
                             
                         self.needed = self.max_vector - self.vector
@@ -303,8 +313,15 @@ class Cannon(object):
                         
             for target in target_list:
                 if target.circle not in canvas.find_all():
+                    
+                    if "powerup" in canvas.gettags(target.line):
+                        for i in target.llist:
+                            canvas.delete(i)
+                            
                     canvas.delete(target.line)
                     target_list.remove(target)
+                    
+                    
                     
                     
                 
