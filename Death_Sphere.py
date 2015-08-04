@@ -13,6 +13,43 @@ canvas = Canvas(root,width=1000,height=600,bg="black")
 
 target_list = []
 bullet_list = []
+
+class Encryption(object):
+    def __init__(self,encryptme,decryptme):
+        self.encryptme = encryptme
+        self.decryptme = decryptme
+            
+    def encrypt(self):
+        key = ''
+        for emptyspace in range(0,10):
+            emptyspace = random.randint(0,9)
+            key += str(emptyspace)
+        
+        
+        score2 = self.encryptme ** 2
+        score3 = str(score2)[::-1]
+     
+        return str(key) + str(key).join(str(score3))
+       
+    def decrypt(self):
+        tbd = self.decryptme
+        oldkey = (tbd[0]+ tbd[1] + tbd[2] + tbd[3] + tbd[4]+ tbd[5]+ tbd[6]+ tbd[7]+ tbd[8]+ tbd[9])
+            
+        newtbd = tbd.split(oldkey)
+        newtbd = "".join(newtbd)
+    
+        decoded = newtbd.split(oldkey)
+        decoded = "".join(decoded)
+            
+        decoded2 = decoded[::-1]
+        return math.sqrt(int(decoded2))
+
+    
+    
+    
+    
+
+    
 class Bullets(object):
     def __init__(self):
         
@@ -159,14 +196,32 @@ class Cannon(object):
             
         elif self.vector < 5 and self.alive == True:
             self.alive = False
+            
+            with open('high_score.txt','r') as read_old_score:
+                decryptsoon = read_old_score.read()
+                doody = Encryption(decryptme=decryptsoon,encryptme="Ignore Me!")
+                self.highest_score = doody.decrypt()
+                
+                
         
             death = Toplevel()
             death.title('You Died!')
-            text = Text(death,bg="black",fg=self.color)
+            text = Text(death,bg=self.bg_color,fg=self.color)
             death.geometry("250x150+375+225")
-            text.insert(INSERT,"YOUR SCORE IS %s" % self.score)
+            text.insert(INSERT,"YOUR HIGH SCORE IS %s \nYOUR SCORE IS %s" % (self.score,int(self.highest_score)))
+            if self.score > self.highest_score:
+                text.insert(INSERT,"\n!!NEW HIGH SCORE!!")
             text.config(state=DISABLED)
             text.pack()
+            
+            
+            if self.score > self.highest_score:
+                with open('high_score.txt','w') as new_high_score:
+                    poopy = Encryption(encryptme = self.score,decryptme="Ignore Me!")
+                    new_high_score.write(poopy.encrypt())
+                
+                
+                
         
         if self.score >= 300:
             self.color = "black"
